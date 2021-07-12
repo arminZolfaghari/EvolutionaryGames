@@ -10,11 +10,11 @@ class Player():
     def __init__(self, mode, control=False):
 
         self.control = control  # if True, playing mode is activated. else, AI mode.
-        self.pos = [100, 275]   # position of the agent
-        self.direction = -1     # if 1, goes upwards. else, goes downwards.
-        self.v = 0              # vertical velocity
-        self.g = 9.8            # gravity constant
-        self.mode = mode        # game mode
+        self.pos = [100, 275]  # position of the agent
+        self.direction = -1  # if 1, goes upwards. else, goes downwards.
+        self.v = 0  # vertical velocity
+        self.g = 9.8  # gravity constant
+        self.mode = mode  # game mode
 
         # neural network architecture (AI mode)
         layer_sizes = self.init_network(mode)
@@ -37,6 +37,11 @@ class Player():
         # AI control
         else:
             agent_position = [camera + self.pos[0], self.pos[1]]
+            # print("****************************************************")
+            # print("agent pos: ", agent_position)
+            # print("box list x : ", box_lists[0].x)
+            # print("box list y : ", box_lists[0].gap_mid)
+            # print("****************************************************")
             self.direction = self.think(mode, box_lists, agent_position, self.v)
 
         # game physics
@@ -92,13 +97,20 @@ class Player():
         if mode == 'gravity':
             layer_sizes = [6, 20, 1]
         elif mode == 'helicopter':
-            layer_sizes = [6, 20, 1]
+            layer_sizes = [7, 20, 1]
         elif mode == 'thrust':
             layer_sizes = [6, 20, 1]
         return layer_sizes
 
-    
     def think(self, mode, box_lists, agent_position, velocity):
+        if len(box_lists) > 1:
+            input_layer = np.array(
+                [[agent_position[0]], [agent_position[1]], [velocity], [box_lists[0].x], [box_lists[0].gap_mid],
+                 [box_lists[1].x], [box_lists[1].gap_mid]])
+        else:
+            input_layer = np.array(
+                [[agent_position[0]], [agent_position[1]], [velocity], [box_lists[0].x], [box_lists[0].gap_mid],
+                 [0], [0]])
 
         # TODO
         # mode example: 'helicopter'
@@ -106,7 +118,12 @@ class Player():
         # agent_position example: [600, 250]
         # velocity example: 7
 
-        direction = -1
+        if mode == "helicopter":
+            if self.nn.forward(input_layer) >= 0.5:
+                direction = 1
+            else:
+                direction = -1
+
         return direction
 
     def collision_detection(self, mode, box_lists, camera):
