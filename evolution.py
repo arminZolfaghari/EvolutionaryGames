@@ -1,6 +1,25 @@
+import copy
+import random
+
 from player import Player
 import numpy as np
 from config import CONFIG
+
+mutation_prob = 0.4
+
+
+# add noise to matrix for mutation
+def add_noise(matrix):
+    noise = np.random.normal(0, 0.2, matrix.shape)
+    matrix += noise
+    return matrix
+
+
+# get fitness all players
+def get_players_fitness(players):
+    players_fitness = []
+    for player in players:
+        players_fitness.append(player.fitness)
 
 
 class Evolution():
@@ -14,11 +33,12 @@ class Evolution():
             p.fitness = delta_xs[i]
 
     def mutate(self, child):
-
         # TODO
         # child: an object of class `Player`
-        pass
-
+        child.nn.W1 = add_noise(child.nn.W1)
+        child.nn.b1 = add_noise(child.nn.b1)
+        child.nn.W2 = add_noise(child.nn.W2)
+        child.nn.b2 = add_noise(child.nn.b2)
 
     def generate_new_population(self, num_players, prev_players=None):
 
@@ -35,8 +55,23 @@ class Evolution():
             # TODO (additional): a selection method other than `fitness proportionate`
             # TODO (additional): implementing crossover
 
-            new_players = prev_players
-            return new_players
+
+            players_fitness_arr = get_players_fitness(prev_players)
+
+            # create child from best parent
+            children_arr = []
+            for i in range(num_players):
+                # parent = random.choices(prev_players, weights=players_fitness_arr, k=1)
+                parent = prev_players[i]
+                child = copy.deepcopy(parent)
+                # if random.random() < mutation_prob:
+                self.mutate(child)
+                children_arr.append(child)
+
+
+            new_players = prev_players + children_arr
+            new_players.sort(key=lambda x: x.fitness, reverse=True)
+            return new_players[: num_players]
 
     def next_population_selection(self, players, num_players):
 
@@ -46,5 +81,9 @@ class Evolution():
 
         # TODO (additional): a selection method other than `top-k`
         # TODO (additional): plotting
+
+        players.sort(key=lambda x: x.fitness, reverse=True)
+        # for player in players:
+        #     print(player.fitness)
 
         return players[: num_players]

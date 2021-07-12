@@ -1,11 +1,11 @@
 import numpy as np
-import config
+from config import CONFIG
 
 
 # input layer isn't normal, have to normalize
 def normalize_input_layer(input_layer):
-    max_width = config.CONFIG['WIDTH']
-    max_height = config.CONFIG['HEIGHT']
+    max_width = CONFIG['WIDTH']
+    max_height = CONFIG['HEIGHT']
 
     input_layer[0], input_layer[1] = input_layer[0] / max_width, input_layer[1] / max_height
     input_layer[2] = input_layer[2] / 10
