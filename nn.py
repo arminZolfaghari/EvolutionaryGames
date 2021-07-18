@@ -26,6 +26,14 @@ class NeuralNetwork():
         self.b1 = np.zeros((n_h1, 1))
         self.W2 = np.random.randn(n_y, n_h1)
         self.b2 = np.zeros((n_y, 1))
+        # self.W1 = np.random.uniform(-0.5, 0.5, (n_h1, n_x))
+        # self.W2 = np.random.uniform(-0.5, 0.5, (n_y, n_h1))
+        # self.W1 = np.random.normal(0, 0.25, (n_h1, n_x))
+        # self.W2 = np.random.normal(0, 0.25, (n_y, n_h1))
+        # print(self.W1)
+        # print(self.W2)
+        # print(self.b1)
+        # print(self.b2)
 
     # sigmoid function
     def activation(self, x):
@@ -55,4 +63,7 @@ class NeuralNetwork():
         # print("A2 : ", A2)
         # print("***************")
         # print("A2 : ", A2[0][0])
-        return A2[0][0]
+        if A2[0][0] >= A2[1][0]:
+            return 1
+        else:
+            return -1

@@ -37,11 +37,6 @@ class Player():
         # AI control
         else:
             agent_position = [camera + self.pos[0], self.pos[1]]
-            # print("****************************************************")
-            # print("agent pos: ", agent_position)
-            # print("box list x : ", box_lists[0].x)
-            # print("box list y : ", box_lists[0].gap_mid)
-            # print("****************************************************")
             self.direction = self.think(mode, box_lists, agent_position, self.v)
 
         # game physics
@@ -95,25 +90,27 @@ class Player():
 
         layer_sizes = None
         if mode == 'gravity':
-            layer_sizes = [6, 20, 1]
+            layer_sizes = [6, 20, 2]
         elif mode == 'helicopter':
-            layer_sizes = [9, 20, 1]
+            layer_sizes = [9, 20, 2]
         elif mode == 'thrust':
-            layer_sizes = [6, 20, 1]
+            layer_sizes = [6, 20, 2]
         return layer_sizes
 
     def think(self, mode, box_lists, agent_position, velocity):
         if len(box_lists) == 0:
+
             input_layer = np.array(
                 [[agent_position[0]], [agent_position[1]], [velocity], [0], [0],
                  [0], [0], [0], [0]])
 
         elif len(box_lists) == 1:
+
             input_layer = np.array(
                 [[agent_position[0]], [agent_position[1]], [velocity], [box_lists[0].x], [box_lists[0].gap_mid],
                  [0], [0], [0], [0]])
 
-        elif len(box_lists) >= 2:
+        elif len(box_lists) == 2:
             input_layer = np.array(
                 [[agent_position[0]], [agent_position[1]], [velocity], [box_lists[0].x], [box_lists[0].gap_mid],
                  [box_lists[1].x], [box_lists[1].gap_mid], [0], [0]])
@@ -132,12 +129,13 @@ class Player():
         # velocity example: 7
 
         if mode == "helicopter":
-            if self.nn.forward(input_layer) >= 0.5:
-                direction = 1
-            else:
-                direction = -1
-
-        return direction
+            # print(self.nn.forward(input_layer))
+            # if self.nn.forward(input_layer) >= 0.5:
+            #     direction = 1
+            # else:
+            #     direction = -1
+            direction = self.nn.forward(input_layer)
+            return direction
 
     def collision_detection(self, mode, box_lists, camera):
         if mode == 'helicopter':
