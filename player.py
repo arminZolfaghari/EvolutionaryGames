@@ -90,28 +90,28 @@ class Player():
 
         layer_sizes = None
         if mode == 'gravity':
-            layer_sizes = [5, 20, 2]
+            layer_sizes = [7, 25, 2]
         elif mode == 'helicopter':
-            layer_sizes = [5, 20, 2]
+            layer_sizes = [7, 25, 2]
         elif mode == 'thrust':
-            layer_sizes = [5, 20, 2]
+            layer_sizes = [7, 25, 2]
         return layer_sizes
 
     def think(self, mode, box_lists, agent_position, velocity):
         if len(box_lists) == 0:
 
             input_layer = np.array(
-                [[agent_position[0]], [agent_position[1]], [velocity], [0], [0]])
+                [[agent_position[0]], [agent_position[1]], [velocity], [0], [0], [0], [0]])
 
-        elif len(box_lists) >= 1:
+        elif len(box_lists) == 1:
 
             input_layer = np.array(
-                [[agent_position[0]], [agent_position[1]], [velocity], [box_lists[0].x], [box_lists[0].gap_mid]])
+                [[agent_position[0]], [agent_position[1]], [velocity], [box_lists[0].x], [box_lists[0].gap_mid], [0], [0]])
 
-        # elif len(box_lists) == 2:
-        #     input_layer = np.array(
-        #         [[agent_position[0]], [agent_position[1]], [velocity], [box_lists[0].x], [box_lists[0].gap_mid],
-        #          [box_lists[1].x], [box_lists[1].gap_mid], [0], [0]])
+        elif len(box_lists) >= 2:
+            input_layer = np.array(
+                [[agent_position[0]], [agent_position[1]], [velocity], [box_lists[0].x], [box_lists[0].gap_mid],
+                 [box_lists[1].x], [box_lists[1].gap_mid]])
         #
         # elif len(box_lists) >= 3:
         #     input_layer = np.array(
@@ -125,15 +125,29 @@ class Player():
         # box_lists: an array of `BoxList` objects
         # agent_position example: [600, 250]
         # velocity example: 7
+        output_layer = self.nn.forward(input_layer)
 
         if mode == "helicopter":
-            # print(self.nn.forward(input_layer))
-            # if self.nn.forward(input_layer) >= 0.5:
-            #     direction = 1
-            # else:
-            #     direction = -1
-            direction = self.nn.forward(input_layer)
-            return direction
+            if output_layer[0][0] >= output_layer[1][0]:
+                direction = -1
+            else:
+                direction = +1
+
+        if mode == "gravity":
+            if output_layer[0][0] >= output_layer[1][0]:
+                direction = -1
+            else:
+                direction = +1
+
+        if mode == 'thrust':
+            if output_layer[0][0] - output_layer[1][0] > 0.2:
+                direction = -1
+            elif output_layer[1][0] - output_layer[0][0] > 0.2:
+                direction = +1
+            else:
+                direction = 0
+
+        return direction
 
     def collision_detection(self, mode, box_lists, camera):
         if mode == 'helicopter':
