@@ -4,13 +4,15 @@ import random
 from player import Player
 import numpy as np
 from config import CONFIG
+from SaveGeneration import *
 
 mutation_prob = 0.3
 
 
-# plot average, max, min of fitness function
-def plotting():
-    pass
+# save generation information
+def save_generation_information(max, min, avg):
+    write_to_file(max, min, avg)
+
 
 
 # add noise to matrix for mutation
@@ -88,10 +90,16 @@ class Evolution():
         # players: an array of `Player` objects
 
         # TODO (additional): a selection method other than `top-k`
-        # TODO (additional): plotting
+
+        # save generation information to plotting
+        all_fitness_in_generation = get_players_fitness(players)
+        max = np.max(all_fitness_in_generation)
+        min = np.min(all_fitness_in_generation)
+        avg = np.mean(all_fitness_in_generation)
+        save_generation_information(max, min, avg)
+
 
         players.sort(key=lambda x: x.fitness, reverse=True)
-        plotting()
         # for player in players:
         #     print(player.fitness)
         return players[: num_players]
