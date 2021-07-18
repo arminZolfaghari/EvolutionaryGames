@@ -8,12 +8,18 @@ from config import CONFIG
 mutation_prob = 0.3
 
 
+# plot average, max, min of fitness function
+def plotting():
+    pass
+
+
 # add noise to matrix for mutation
 def add_noise(matrix):
     # noise = np.random.uniform(-0.5, 0.5, matrix.shape)
-    noise = np.random.normal(0, 0.25, matrix.shape)
-    matrix += noise
-    return matrix
+    matrix_copy = copy.deepcopy(matrix)
+    noise = np.random.normal(0, 0.5, matrix.shape)
+    matrix_copy += noise
+    return matrix_copy
 
 
 # get fitness all players
@@ -21,6 +27,7 @@ def get_players_fitness(players):
     players_fitness = []
     for player in players:
         players_fitness.append(player.fitness)
+    return players_fitness
 
 
 class Evolution():
@@ -56,24 +63,26 @@ class Evolution():
             # TODO (additional): a selection method other than `fitness proportionate`
             # TODO (additional): implementing crossover
 
-            players_fitness_arr = get_players_fitness(prev_players)
+            prev_players_copy = copy.deepcopy(prev_players)
+
+            players_fitness_arr = get_players_fitness(prev_players_copy)
+            prev_players_copy.sort(key=lambda x: x.fitness, reverse=True)
 
             # create child from best parent
             children_arr = []
             for i in range(num_players):
-                parent = random.choices(prev_players, weights=players_fitness_arr, k=1)
-                # parent = prev_players[i]
-                child = copy.deepcopy(parent[0])
-                if random.random() < mutation_prob:
-                    self.mutate(child)
+                # parent = random.choices(prev_players, weights=players_fitness_arr, k=1)
+                child = prev_players_copy[i]
+                # if random.random() < mutation_prob:
+                self.mutate(child)
                 children_arr.append(child)
 
-            # new_players = children_arr + prev_players
-            # new_players.sort(key=lambda x: x.fitness, reverse=True)
-            return children_arr
+        # new_players = children_arr + prev_players
+        # new_players.sort(key=lambda x: x.fitness, reverse=True)
+        return children_arr
+
 
     def next_population_selection(self, players, num_players):
-
         # TODO
         # num_players example: 100
         # players: an array of `Player` objects
@@ -82,7 +91,7 @@ class Evolution():
         # TODO (additional): plotting
 
         players.sort(key=lambda x: x.fitness, reverse=True)
+        plotting()
         # for player in players:
         #     print(player.fitness)
-
         return players[: num_players]

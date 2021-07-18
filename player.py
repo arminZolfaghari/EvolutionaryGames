@@ -90,35 +90,33 @@ class Player():
 
         layer_sizes = None
         if mode == 'gravity':
-            layer_sizes = [6, 20, 2]
+            layer_sizes = [5, 20, 2]
         elif mode == 'helicopter':
-            layer_sizes = [9, 20, 2]
+            layer_sizes = [5, 20, 2]
         elif mode == 'thrust':
-            layer_sizes = [6, 20, 2]
+            layer_sizes = [5, 20, 2]
         return layer_sizes
 
     def think(self, mode, box_lists, agent_position, velocity):
         if len(box_lists) == 0:
 
             input_layer = np.array(
-                [[agent_position[0]], [agent_position[1]], [velocity], [0], [0],
-                 [0], [0], [0], [0]])
+                [[agent_position[0]], [agent_position[1]], [velocity], [0], [0]])
 
-        elif len(box_lists) == 1:
+        elif len(box_lists) >= 1:
 
             input_layer = np.array(
-                [[agent_position[0]], [agent_position[1]], [velocity], [box_lists[0].x], [box_lists[0].gap_mid],
-                 [0], [0], [0], [0]])
+                [[agent_position[0]], [agent_position[1]], [velocity], [box_lists[0].x], [box_lists[0].gap_mid]])
 
-        elif len(box_lists) == 2:
-            input_layer = np.array(
-                [[agent_position[0]], [agent_position[1]], [velocity], [box_lists[0].x], [box_lists[0].gap_mid],
-                 [box_lists[1].x], [box_lists[1].gap_mid], [0], [0]])
-
-        elif len(box_lists) >= 3:
-            input_layer = np.array(
-                [[agent_position[0]], [agent_position[1]], [velocity], [box_lists[0].x], [box_lists[0].gap_mid],
-                 [box_lists[1].x], [box_lists[1].gap_mid], [box_lists[2].x], [box_lists[2].gap_mid]])
+        # elif len(box_lists) == 2:
+        #     input_layer = np.array(
+        #         [[agent_position[0]], [agent_position[1]], [velocity], [box_lists[0].x], [box_lists[0].gap_mid],
+        #          [box_lists[1].x], [box_lists[1].gap_mid], [0], [0]])
+        #
+        # elif len(box_lists) >= 3:
+        #     input_layer = np.array(
+        #         [[agent_position[0]], [agent_position[1]], [velocity], [box_lists[0].x], [box_lists[0].gap_mid],
+        #          [box_lists[1].x], [box_lists[1].gap_mid], [box_lists[2].x], [box_lists[2].gap_mid]])
 
 
 

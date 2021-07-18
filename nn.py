@@ -10,7 +10,7 @@ def normalize_input_layer(input_layer):
     input_layer[0], input_layer[1] = input_layer[0] / max_width, input_layer[1] / max_height
     input_layer[2] = input_layer[2] / 10
     input_layer[3], input_layer[4] = input_layer[3] / max_width, input_layer[4] / max_height
-    input_layer[5], input_layer[6] = input_layer[5] / max_width, input_layer[6] / max_height
+    # input_layer[5], input_layer[6] = input_layer[5] / max_width, input_layer[6] / max_height
 
 
 class NeuralNetwork():
@@ -24,12 +24,15 @@ class NeuralNetwork():
         # print("n_x, n_h1, n_y ", n_x, n_h1, n_y)
         self.W1 = np.random.randn(n_h1, n_x)
         self.b1 = np.zeros((n_h1, 1))
-        self.W2 = np.random.randn(n_y, n_h1)
         self.b2 = np.zeros((n_y, 1))
+        self.W2 = np.random.randn(n_y, n_h1)
+        # self.b1 = np.random.normal(0, 0, (n_h1, 1))
+        # self.b2 = np.random.normal(0, 0, (n_y, 1))
+
         # self.W1 = np.random.uniform(-0.5, 0.5, (n_h1, n_x))
         # self.W2 = np.random.uniform(-0.5, 0.5, (n_y, n_h1))
-        # self.W1 = np.random.normal(0, 0.25, (n_h1, n_x))
-        # self.W2 = np.random.normal(0, 0.25, (n_y, n_h1))
+        # self.W1 = np.random.normal(0, 0.5, (n_h1, n_x))
+        # self.W2 = np.random.normal(0, 0.5, (n_y, n_h1))
         # print(self.W1)
         # print(self.W2)
         # print(self.b1)
