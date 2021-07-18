@@ -6,7 +6,7 @@ import numpy as np
 from config import CONFIG
 from SaveGeneration import *
 
-mutation_prob = 1
+mutation_prob = 0.9
 
 
 # save generation information
@@ -15,10 +15,10 @@ def save_generation_information(max, min, avg):
 
 
 # add noise to matrix for mutation
-def add_noise(matrix):
+def add_noise(matrix, noise):
     # noise = np.random.uniform(-0.5, 0.5, matrix.shape)
     matrix_copy = copy.deepcopy(matrix)
-    noise = np.random.normal(0, 0.6, matrix.shape)
+    noise = np.random.normal(0, noise, matrix.shape)
     matrix_copy += noise
     return matrix_copy
 
@@ -44,13 +44,13 @@ class Evolution():
     def mutate(self, child):
         # child: an object of class `Player`
         if random.random() <= mutation_prob:
-            child.nn.W1 = add_noise(child.nn.W1)
+            child.nn.W1 = add_noise(child.nn.W1, 0.5)
         if random.random() <= mutation_prob:
-            child.nn.b1 = add_noise(child.nn.b1)
+            child.nn.b1 = add_noise(child.nn.b1, 0.05)
         if random.random() <= mutation_prob:
-            child.nn.W2 = add_noise(child.nn.W2)
+            child.nn.W2 = add_noise(child.nn.W2, 0.5)
         if random.random() <= mutation_prob:
-            child.nn.b2 = add_noise(child.nn.b2)
+            child.nn.b2 = add_noise(child.nn.b2, 0.05)
 
     def generate_new_population(self, num_players, prev_players=None):
 
@@ -59,16 +59,12 @@ class Evolution():
             return [Player(self.mode) for _ in range(num_players)]
 
         else:
-
-            # TODO
             # num_players example: 150
             # prev_players: an array of `Player` objects
 
             # TODO (additional): a selection method other than `fitness proportionate`
-            # TODO (additional): implementing crossover
 
             prev_players_copy = copy.deepcopy(prev_players)
-
             players_fitness_arr = get_players_fitness(prev_players_copy)
             # prev_players_copy.sort(key=lambda x: x.fitness, reverse=True)
 
@@ -83,8 +79,12 @@ class Evolution():
                 self.mutate(child)
                 children_arr.append(child)
 
-        # new_players = children_arr + prev_players
-        # new_players.sort(key=lambda x: x.fitness, reverse=True)
+            # while len(children_arr) > num_players:
+            #     parents = random.choices(prev_players_copy, weights=[1] * num_players, k=2)
+            #     parent1 = copy.deepcopy(parents[0])
+            #     parent2 = copy.deepcopy(parents[1])
+            #     child.nn.W1, child.nn.W2, child.nn.b1, child.nn.b2 = self.crossover(parent1, parent2)
+
         return children_arr
 
     def crossover(self, parent1, parent2):
