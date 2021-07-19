@@ -22,8 +22,8 @@ def create_nn_input_layer(box_lists, agent_position, velocity):
     return input_layer
 
 
-class Player():
 
+class Player():
     def __init__(self, mode, control=False):
 
         self.control = control  # if True, playing mode is activated. else, AI mode.
@@ -142,7 +142,7 @@ class Player():
                 direction = -1
 
         if mode == "gravity":
-            if output_layer >= 0.3:
+            if output_layer >= 0.4:
                 direction = +1
             else:
                 direction = -1
