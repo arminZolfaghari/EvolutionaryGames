@@ -6,7 +6,11 @@ import numpy as np
 from config import CONFIG
 from SaveGeneration import *
 
-mutation_prob = 0.9
+mutation_prob = 0.3
+
+
+def generate_random_uniform():
+    return np.random.uniform(0, 1, 1)[0]
 
 
 # save generation information
@@ -31,6 +35,14 @@ def get_players_fitness(players):
     return players_fitness
 
 
+def new_fitness_function(fitness_arr):
+    new_fitness_arr = []
+    for fitness in fitness_arr:
+        new_fitness_arr.append(fitness ** 2)
+
+    return new_fitness_arr
+
+
 class Evolution():
 
     def __init__(self, mode):
@@ -43,14 +55,14 @@ class Evolution():
 
     def mutate(self, child):
         # child: an object of class `Player`
-        if random.random() <= mutation_prob:
+        if generate_random_uniform() <= mutation_prob:
             child.nn.W1 = add_noise(child.nn.W1, 0.5)
-        if random.random() <= mutation_prob:
-            child.nn.b1 = add_noise(child.nn.b1, 0.05)
-        if random.random() <= mutation_prob:
+        if generate_random_uniform() <= mutation_prob:
+            child.nn.b1 = add_noise(child.nn.b1, 0.5)
+        if generate_random_uniform() <= mutation_prob:
             child.nn.W2 = add_noise(child.nn.W2, 0.5)
-        if random.random() <= mutation_prob:
-            child.nn.b2 = add_noise(child.nn.b2, 0.05)
+        if generate_random_uniform() <= mutation_prob:
+            child.nn.b2 = add_noise(child.nn.b2, 0.5)
 
     def generate_new_population(self, num_players, prev_players=None):
 
@@ -66,12 +78,13 @@ class Evolution():
 
             prev_players_copy = copy.deepcopy(prev_players)
             players_fitness_arr = get_players_fitness(prev_players_copy)
+            players_new_fitness_arr = new_fitness_function(players_fitness_arr)
             # prev_players_copy.sort(key=lambda x: x.fitness, reverse=True)
 
             # create child from best parent
             children_arr = []
 
-            parent = random.choices(prev_players_copy, weights=players_fitness_arr, k=150)
+            parent = random.choices(prev_players_copy, weights=players_new_fitness_arr, k=150)
             for i in range(num_players):
                 # parent = random.choices(prev_players, weights=players_fitness_arr, k=1)
                 child = copy.deepcopy(parent[i])

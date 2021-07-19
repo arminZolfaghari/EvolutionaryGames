@@ -1,8 +1,25 @@
 import pygame
 import numpy as np
+import math
 
 from nn import NeuralNetwork
 from config import CONFIG
+
+
+def create_nn_input_layer(box_lists, agent_position, velocity):
+    default_x = CONFIG["WIDTH"]
+    default_y = CONFIG["HEIGHT"]
+    default_z = math.sqrt((default_x ** 2) + (default_y ** 2))
+    if len(box_lists) == 0:
+        input_layer = np.array([[default_x], [default_y], [default_x], [default_y], [default_z], [velocity]])
+    elif len(box_lists) == 1:
+        input_layer = np.array([[agent_position[0] - box_lists[0].x], [agent_position[1] - box_lists[0].gap_mid],
+                                [default_x], [default_y], [default_z], [velocity]])
+    else:
+        input_layer = np.array([[agent_position[0] - box_lists[0].x], [agent_position[1] - box_lists[0].gap_mid],
+                                [agent_position[0] - box_lists[1].x], [agent_position[1] - box_lists[1].gap_mid],
+                                [default_z], [velocity]])
+    return input_layer
 
 
 class Player():
@@ -19,7 +36,7 @@ class Player():
         # neural network architecture (AI mode)
         layer_sizes = self.init_network(mode)
 
-        self.nn = NeuralNetwork(layer_sizes)
+        self.nn = NeuralNetwork(layer_sizes, mode)
         self.fitness = 0  # fitness of agent
 
     def move(self, box_lists, camera, events=None):
@@ -87,34 +104,29 @@ class Player():
     def init_network(self, mode):
 
         # you can change the parameters below
-
         layer_sizes = None
         if mode == 'gravity':
-            layer_sizes = [5, 25, 2]
+            layer_sizes = [6, 20, 1]
         elif mode == 'helicopter':
-            layer_sizes = [5, 25, 2]
+            layer_sizes = [6, 30, 1]
         elif mode == 'thrust':
-            layer_sizes = [5, 25, 2]
+            layer_sizes = [6, 30, 1]
         return layer_sizes
 
     def think(self, mode, box_lists, agent_position, velocity):
-        if len(box_lists) == 0:
-
-            input_layer = np.array(
-                [[agent_position[0]], [agent_position[1]], [velocity], [0], [0]])
-
-        elif len(box_lists) >= 1:
-
-            input_layer = np.array(
-                [[agent_position[0]], [agent_position[1]], [velocity], [box_lists[0].x], [box_lists[0].gap_mid]])
-
+        # if len(box_lists) == 0:
+        #     input_layer = np.array(
+        #         [[agent_position[0]], [agent_position[1]], [velocity], [0], [0], [0]])
+        # elif len(box_lists) >= 1:
+        #     input_layer = np.array(
+        #         [[agent_position[0]], [agent_position[1]], [velocity], [box_lists[0].x], [box_lists[0].gap_mid - 2 * 60], [box_lists[0].gap_mid + 2 * 60]])
         #
         # elif len(box_lists) >= 3:
         #     input_layer = np.array(
         #         [[agent_position[0]], [agent_position[1]], [velocity], [box_lists[0].x], [box_lists[0].gap_mid],
         #          [box_lists[1].x], [box_lists[1].gap_mid], [box_lists[2].x], [box_lists[2].gap_mid]])
 
-
+        input_layer = create_nn_input_layer(box_lists, agent_position, velocity)
 
         # TODO
         # mode example: 'helicopter'
@@ -124,22 +136,22 @@ class Player():
         output_layer = self.nn.forward(input_layer)
 
         if mode == "helicopter":
-            if output_layer[0][0] >= output_layer[1][0]:
-                direction = -1
-            else:
+            if output_layer >= 0.5:
                 direction = +1
+            else:
+                direction = -1
 
         if mode == "gravity":
-            if output_layer[0][0] >= output_layer[1][0]:
-                direction = -1
-            else:
+            if output_layer >= 0.3:
                 direction = +1
+            else:
+                direction = -1
 
         if mode == 'thrust':
-            if output_layer[0][0] - output_layer[1][0] > 0.2:
-                direction = -1
-            elif output_layer[1][0] - output_layer[0][0] > 0.2:
+            if output_layer >= 0.5:
                 direction = +1
+            elif output_layer <= 0.4:
+                direction = -1
             else:
                 direction = 0
 
