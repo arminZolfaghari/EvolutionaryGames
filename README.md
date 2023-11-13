@@ -1,6 +1,6 @@
 # EvolutionaryGames
 
-A project designed for Computational Intelligence course. <br> <br>
+A project designed for the Computational Intelligence Course. <br> <br>
 In this project, a simple 2D minigame is implemented. <br>
 The agent needs to learn to maneuver via neural network + evolution.
 
